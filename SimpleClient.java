@@ -14,7 +14,6 @@ public class SimpleClient {
 
         Socket socketOfClient = null;
         BufferedOutputStream bos = null;
-        BufferedInputStream bis = null;
 
         try {
             String parentDir = "/tmp/" + username + "/";
@@ -30,13 +29,21 @@ public class SimpleClient {
                 bos = new BufferedOutputStream(socketOfClient.getOutputStream());
                 DataInputStream dis = new DataInputStream(new FileInputStream(filePath + filename));
 
-                // File file = new File(filePath + filename);
+                // Transfer files and server address list
 
                 try (DataOutputStream dos = new DataOutputStream(bos)) {
-                    // Write the filepath on the server
+                    // Write the filepath and filename on the server
                     dos.writeUTF(parentDir + filePath);
                     dos.writeUTF(filename);
 
+                    // Write serverHost array
+                    dos.writeInt(serverHost.length);
+                    for(int j = 0; j < serverHost.length; j++) {
+                        dos.writeUTF(serverHost[j]);
+                    }
+
+                    while(dis.available() > 0)
+                        
                     // Write the file
                     while(dis.available() > 0)
                         dos.write(dis.readByte());
@@ -46,13 +53,11 @@ public class SimpleClient {
                 }
 
                 bos.close();
-                //bis.close();
-
             }
-            
+
 
             bos.close();
-            bis.close();
+
             socketOfClient.close();
 
         } catch (UnknownHostException e) {

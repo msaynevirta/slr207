@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SimpleServerProgram {
 
@@ -21,7 +23,6 @@ public class SimpleServerProgram {
         final String username = "msaynevi-21";
         
         ServerSocket listener = null;
-        BufferedInputStream bis = null;
         DataOutputStream dos = null;
         Socket socketOfServer = null;
 
@@ -43,11 +44,13 @@ public class SimpleServerProgram {
             // Get new Socket at Server.    
             socketOfServer = listener.accept();
             System.out.println("Accept a client!");
+
+            List<String> serverHost = new ArrayList<String>();
             String parentDir = null;
-            String filename = "s.txt";
+            String filename;
 
             // Open buffered input and output streams
-            bis = new BufferedInputStream(socketOfServer.getInputStream());
+            BufferedInputStream bis = new BufferedInputStream(socketOfServer.getInputStream());
             
             try (DataInputStream dis = new DataInputStream(bis)) {
                 // Read the parent directory on the server
@@ -59,6 +62,11 @@ public class SimpleServerProgram {
 
                 // Read the filename for the server
                 filename = dis.readUTF();
+
+                // Read serverHost array
+                Integer serverHostLen = dis.readInt();
+                for(int j = 0; j < serverHostLen; j++)
+                    serverHost.add(dis.readUTF());
 
                 dos = new DataOutputStream(new FileOutputStream(parentDir + filename));
 
