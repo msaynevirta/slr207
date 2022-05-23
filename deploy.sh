@@ -18,5 +18,5 @@ for c in ${computers[@]}; do
   echo ${command2[*]}
   "${command2[@]}"
   echo ${command3[*]}
-  "${command3[@]}"
+  "${command3[@]}" &
 done
