@@ -3,73 +3,62 @@ import java.net.*;
 
 public class SimpleClient {
 
-   public static void main(String[] args) {
+    public static void main(String[] args) {
 
-       // Server Host
-       final String serverHost = "tp-1a226-09.enst.fr";
+        // Server Host'
+        final String username = "msaynevi-21";
+        final String serverHost[] = { "tp-1a226-07.enst.fr",
+                                      "tp-1a226-08.enst.fr",
+                                      "tp-1a226-09.enst.fr" };
 
-       Socket socketOfClient = null;
-       BufferedWriter os = null;
-       BufferedReader is = null;
+        Socket socketOfClient = null;
+        BufferedOutputStream bos = null;
+        BufferedInputStream bis = null;
 
-       try {
-           
-           // Send a request to connect to the server is listening
-           // on machine 'localhost' port 9999.
-           socketOfClient = new Socket(serverHost, 3419);
+        try {
+            String parentDir = "/tmp/" + username + "/";
+            String filePath = "splits/";
 
-           // Create output stream at the client (to send data to the server)
-           os = new BufferedWriter(new OutputStreamWriter(socketOfClient.getOutputStream()));
+            for(int i = 0; i < 3; i++) {
+                String filename = "s" + Integer.toString(i) + ".txt";
+                // Send a request to connect to the server is listening
+                // on machine 'localhost' port 9999.
+                socketOfClient = new Socket(serverHost[i], 3419);
 
+                // Create output stream at the client (to send data to the server)
+                bos = new BufferedOutputStream(socketOfClient.getOutputStream());
+                DataInputStream dis = new DataInputStream(new FileInputStream(filePath + filename));
 
-           // Input stream at Client (Receive data from the server).
-           is = new BufferedReader(new InputStreamReader(socketOfClient.getInputStream()));
+                // File file = new File(filePath + filename);
 
-       } catch (UnknownHostException e) {
-           System.err.println("Don't know about host " + serverHost);
-           return;
-       } catch (IOException e) {
-           System.err.println("Couldn't get I/O for the connection to " + serverHost);
-           return;
-       }
+                try (DataOutputStream dos = new DataOutputStream(bos)) {
+                    // Write the filepath on the server
+                    dos.writeUTF(parentDir + filePath);
+                    dos.writeUTF(filename);
 
-       try {
+                    // Write the file
+                    while(dis.available() > 0)
+                        dos.write(dis.readByte());
 
-           // Write data to the output stream of the Client Socket.
-           os.write("HELO");
- 
-           // End of line
-           os.newLine();
-   
-           // Flush data.
-           os.flush();  
-           os.write("I am Tom Cat");
-           os.newLine();
-           os.flush();
-           os.write("QUIT");
-           os.newLine();
-           os.flush();
+                    dos.close();
+                    dis.close();
+                }
 
+                bos.close();
+                //bis.close();
 
-           
-           // Read data sent from the server.
-           // By reading the input stream of the Client Socket.
-           String responseLine;
-           while ((responseLine = is.readLine()) != null) {
-               System.out.println("Server: " + responseLine);
-               if (responseLine.indexOf("OK") != -1) {
-                   break;
-               }
-           }
+            }
+            
 
-           os.close();
-           is.close();
-           socketOfClient.close();
-       } catch (UnknownHostException e) {
-           System.err.println("Trying to connect to unknown host: " + e);
-       } catch (IOException e) {
-           System.err.println("IOException:  " + e);
-       }
-   }
+            bos.close();
+            bis.close();
+            socketOfClient.close();
+
+        } catch (UnknownHostException e) {
+            System.err.println("Trying to connect to unknown host: " + e);
+        } catch (IOException e) {
+            System.err.println("IOException:  " + e);
+        }
+    }
 
 }
