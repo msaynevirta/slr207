@@ -10,6 +10,7 @@ public class SimpleClient {
         final String serverHost[] = { "tp-1a226-07.enst.fr",
                                       "tp-1a226-08.enst.fr",
                                       "tp-1a226-09.enst.fr" };
+        final Integer nSplits = serverHost.length;
 
         Socket socketOfClient = null;
         BufferedOutputStream bos = null;
@@ -19,7 +20,7 @@ public class SimpleClient {
             String parentDir = "/tmp/" + username + "/";
             String filePath = "splits/";
 
-            for(int i = 0; i < 3; i++) {
+            for(int i = 0; i < nSplits; i++) {
                 String filename = "s" + Integer.toString(i) + ".txt";
                 // Send a request to connect to the server is listening
                 // on machine 'localhost' port 9999.
